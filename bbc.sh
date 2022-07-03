@@ -1,6 +1,6 @@
 #!/bin/bash
 allargs=()
-while getopts abcd*: flag; do
+while getopts abcs*: flag; do
     case ${flag} in
     a)
         break
@@ -11,13 +11,17 @@ while getopts abcd*: flag; do
     c)
         allargs+=('culture')
         ;;
-    d)
+    s)
         allargs+=('sport')
         ;;
     esac
 done
 
-# printf "%s\n" "${allargs[@]}" | python3 ./news_scraper.py
-python3 news_scraper.py "aaa"
-python -u "news_scraper.py" &&  echo "${allargs[*]}"
+farbros 
+python -u news_scraper.py
 
+# printf "%s\n" "${allargs[@]}" | python3 ./news_scraper.py
+
+# python -u "news_scraper.py" &&  echo "${allargs[*]}"
+
+# echo "${allargs[*]}"

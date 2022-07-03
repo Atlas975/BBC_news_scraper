@@ -12,7 +12,6 @@ class ScrapeTool():
         self.path = "/home/adilw/Dropbox/Adil_Code/.web_drivers/" # path to web driver file, webdriver name appended
         self.url = url
         self.driver=None
-        focus = None
         match(browser.lower()):
             case "chrome":
                 self.path += "chromedriver"
@@ -48,7 +47,11 @@ class ScrapeTool():
             print("Invalid URL input")
 
     def url_append(self, argument, replace_depth = 0):
-        return f"{self.url}/{argument}" if replace_depth == 0 else f"{self.url_remove(replace_depth)}/{argument}"
+        if replace_depth==0:
+            self.url += f"/{argument}"
+        else:
+            self.url = f"{self.url_remove(replace_depth)}/{argument}"
+        # self.url= "{self.url}/{argument}" if replace_depth == 0 else f"{self.url_remove(replace_depth)}/{argument}"
 
     def url_remove(self, depth = 1):
         for _ in range(depth):
@@ -56,18 +59,23 @@ class ScrapeTool():
             self.url = self.url[:cutoff]
         return self.url
 
-    def element_extract(self, by='xpath', element='//div',*args):
+    def element_extract(self, by='xpath', element='//div',type='text',*args):
         focus = self.driver.find_elements(by=by, value=element)
         content=[]
         for item in focus:
             for arg in args:
                 with contextlib.suppress(NoSuchElementException):
-                    content.append(f"{item.find_element(by=by,value=arg).text}");
+                    match(type):
+                        case 'text':
+                            content.append(f"{item.find_element(by=by,value=arg).text}");
+                        case 'href':
+                            content.append(f"{item.find_element(by=by,value=arg).get_attribute('href')}");
         return content
 
 
         # return [item.find_element(by=by, value=f'./{arg}').text for item in focus for arg in args]
 
-    def kill_bot(self):
+    def kill_bot(self,display=False):
         self.driver.quit()
-        print(f"Bot :{self.__str__} killed")
+        if display:
+            print(f"{self} killed")

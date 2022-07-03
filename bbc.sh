@@ -17,8 +17,8 @@ while getopts abcs*: flag; do
     esac
 done
 
-farbros 
-python -u news_scraper.py
+farbros
+python -u "./news_scraper.py"
 
 # printf "%s\n" "${allargs[@]}" | python3 ./news_scraper.py
 

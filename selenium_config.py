@@ -1,30 +1,45 @@
+import contextlib
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
+from selenium.common.exceptions import NoSuchElementException
+
 
 class ScrapeTool():
     def __init__(self, browser = "chrome", url = "https://www.google.com"):
-        self.path = "/home/adilw/Dropbox/Adil_Code/WebDrivers/" # path to web driver file, webdriver name appended
+        self.path = "/home/adilw/Dropbox/Adil_Code/.web_drivers/" # path to web driver file, webdriver name appended
         self.url = url
-        self.focus = None
+        self.driver=None
+        focus = None
         match(browser.lower()):
             case "chrome":
                 self.path += "chromedriver"
+                op=ChromeOptions()
+                op.headless=True
                 try:
-                    self.driver = webdriver.Chrome(service = Service(executable_path = self.path))
+                    self.driver = webdriver.Chrome(service = Service(executable_path = self.path),options=op)
                 except Exception:
-                    print("Chrome driver not found in file path")
+                    print("Chrome driver or browser not found")
             case "edge":
                 self.path += "msedgedriver"
+                op=EdgeOptions()
+                op.headless=True
                 try:
-                    self.driver = webdriver.Edge(sevice = Service(executable_path = self.path))
+                    self.driver = webdriver.Edge(service = Service(executable_path = self.path),options=op)
                 except Exception:
-                    print("Edge driver not found in file path")
+                    print("Edge driver or browser not found")
             case "firefox":
                 self.path += "geckodriver"
+                op = FirefoxOptions()
+                op.headless=True
                 try:
-                    self.driver = webdriver.Firefox(service = Service(executable_path = self.path))
+                    self.driver = webdriver.Firefox(service=Service(executable_path = self.path),options=op)
                 except Exception:
-                    print("Firefox driver not found in file path")
+                    print("Firefox driver or browser not found")
+        self.driver.get(self.url)
+
 
     def search(self):
         try:
@@ -41,11 +56,18 @@ class ScrapeTool():
             self.url = self.url[:cutoff]
         return self.url
 
-    def element_focus(self, by='xpath', element='//div'):
-        self.focus = self.driver.find_elements(by, element)
+    def element_extract(self, by='xpath', element='//div',*args):
+        focus = self.driver.find_elements(by=by, value=element)
+        content=[]
+        for item in focus:
+            for arg in args:
+                with contextlib.suppress(NoSuchElementException):
+                    content.append(f"{item.find_element(by=by,value=arg).text}");
+        return content
 
-    def element_text(self,by='xpath',*args):
-        return [item.find_element(by,arg).text for item in self.focus for arg in args]
 
+        # return [item.find_element(by=by, value=f'./{arg}').text for item in focus for arg in args]
 
-# d
+    def kill_bot(self):
+        self.driver.quit()
+        print(f"Bot :{self.__str__} killed")
